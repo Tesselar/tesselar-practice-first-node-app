@@ -2,7 +2,6 @@ const person = { name: 'as' }
 
 const { name } = person
 
-
 class Course extends React.Component {
     constructor(props) {
         super(props)
