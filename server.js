@@ -30,9 +30,10 @@ app.get('/api/users', function (request, response) {
 
 app.post('/api/users', function (req, res) {
     try {
-        const newUser = req.body
-        console.log(req.body)
+        const newUser = { name: req.body.baia }
+        console.log(newUser)
         users.push(newUser)
+        res.sendStatus(200)
     } catch (error) {
         response.send('Te he fallado :/')
     }

@@ -8,7 +8,8 @@ class Course extends React.Component {
 
         this.state = {
             users: [],
-            selectedUserName: null
+            selectedUserName: null,
+            inputValue: ''
         }
 
         fetch('/api/users')
@@ -16,7 +17,8 @@ class Course extends React.Component {
                 response.json().then(data => {
                     this.setState({
                         users: data,
-                        selectedUserName: null
+                        selectedUserName: null,
+                        inputValue: ''
                     })
                 })
             })
@@ -36,9 +38,49 @@ class Course extends React.Component {
                 alert('ok')
                 let newUsers = this.state.users.filter(user => user.name !== this.state.selectedUserName)
 
-                this.setState({
-                    users: newUsers,
-                    selectedUserName: null
+                this.setState(prevState => {
+                    return {
+                        users: newUsers,
+                        selectedUserName: null,
+                        inputValue: prevState.inputValue
+                    }
+                })
+            })
+            .catch(e => {
+                console.log(e)
+                alert(':(')
+            })
+    }
+
+    handleInputChange(value) {
+        this.setState(prevState => {
+            prevState.inputValue = value
+            return prevState
+        })
+    }
+
+    createUser() {
+        let body = new FormData()
+
+        fetch(`/api/users`, {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ baia: this.state.inputValue })
+        })
+            .then(response => {
+                alert('Usuario creado')
+                this.setState(prevState => {
+                    prevState.users.push({ name: prevState.inputValue })
+
+                    const newUsers = prevState.users
+
+                    return {
+                        users: newUsers,
+                        selectedUserName: null,
+                        inputValue: null
+                    }
                 })
             })
             .catch(e => {
@@ -54,7 +96,10 @@ class Course extends React.Component {
 
                 <div className="row">
                     <div className="col s6">
-                        <CreateUser />
+                        <CreateUser
+                            onInputChange={(value) => { this.handleInputChange(value) }}
+                            onCreate={() => { this.createUser() }}
+                        />
 
                     </div>
                     <div className="col s6">
@@ -101,21 +146,21 @@ const User = ({ name, onSelectUser }) => {
     )
 }
 
-const CreateUser = props => {
-
-    const addUser = () => {
-        alert('Crear usuario')
-    }
+const CreateUser = ({ onInputChange, onCreate }) => {
 
     return (
         <form>
             <div className="row">
                 <div className="col s8">
-                    <input type="text" name="user" />
+                    <input
+                        type="text"
+                        name="user"
+                        onChange={event => { onInputChange(event.target.value) }}
+                    />
                 </div>
 
                 <div className="col s4">
-                    <button className="waves-effect waves-light btn" type="button" onClick={() => addUser()}>
+                    <button className="waves-effect waves-light btn" type="button" onClick={() => onCreate()}>
                         Crear
                     </button>
                 </div>
