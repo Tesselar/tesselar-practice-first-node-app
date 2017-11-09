@@ -8,18 +8,19 @@ class Course extends React.Component {
         super(props)
 
         this.state = {
-            users: [
-                { name: 'Carlos' },
-                { name: 'Jessica' },
-                { name: 'Estrada' },
-                { name: 'Miguel' },
-                { name: 'Alan' },
-                { name: 'Alberto' },
-                { name: 'Hiram' },
-                { name: 'Ricardo' }
-            ],
+            users: [],
             selectedUserName: null
         }
+
+        fetch('/api/users')
+            .then(response => {
+                response.json().then(data => {
+                    this.setState({
+                        users: data,
+                        selectedUserName: null
+                    })
+                })
+            })
     }
 
     selectUser(userName) {
@@ -30,12 +31,21 @@ class Course extends React.Component {
     }
 
     deleteUser() {
-        let newUsers = this.state.users.filter(user => user.name !== this.state.selectedUserName)
 
-        this.setState({
-            users: newUsers,
-            selectedUserName: null
-        })
+        fetch(`/api/users?name=${this.state.selectedUserName}`, { method: 'delete' })
+            .then(response => {
+                alert('ok')
+                let newUsers = this.state.users.filter(user => user.name !== this.state.selectedUserName)
+
+                this.setState({
+                    users: newUsers,
+                    selectedUserName: null
+                })
+            })
+            .catch(e => {
+                console.log(e)
+                alert(':(')
+            })
     }
 
     render() {
